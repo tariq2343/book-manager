@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library</title>
+   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  
+
+    <style>
+     
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", "Vazir", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #e6f8f0, #c9f5dc);
+  margin: 0;
+  padding: 30px;
+  color: #222;
+}
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.container1 {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  width: 100%;
+}
+
+
+.submitNewAuthor, .submitNewBook {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  width: 380px;
+  transition: all 0.3s ease;
+}
+
+.submitNewAuthor:hover, .submitNewBook:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+h2 {
+  text-align: center;
+  color: #22a856;
+  font-size: 22px;
+  text-shadow: 1px 1px 2px #b4e3be;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #333;
+}
+
+
+input, select, button {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: 1px solid #d1e7d8;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #4cd964;
+  outline: none;
+  box-shadow: 0 0 4px #4cd964;
+}
+
+button {
+  background: #4cd964;
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #34c759;
+  transform: scale(1.03);
+}
+
+#submitAuthor {
+  background: #4cd964;
+}
+
+
+#message, #messageAuthor {
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+}
+
+
+#bookListSection {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+  width: 90%;
+  max-width: 1000px;
+}
+
+#booksTable {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+#booksTable thead {
+  background-color: #7cec8b;
+  color: #111;
+}
+
+#booksTable th, #booksTable td {
+  padding: 12px 10px;
+  text-align: center;
+  border: 1px solid #e0f2e5;
+}
+
+#booksTable tbody tr:nth-child(even) {
+  background-color: #eefaf0;
+}
+
+#booksTable tbody tr:hover {
+  background-color: #d8f7de;
+}
+
+
+#booksTable button {
+  background: #82e892;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin: 2px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#booksTable button:hover {
+  background: #34c759;
+  color: #fff;
+}
+
+
+#downloadTable {
+  width: 200px;
+  background: #52d174;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 15px;
+  transition: 0.3s;
+}
+
+#downloadTable:hover {
+  background: #34c759;
+}
+
+
+#exportOptions {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+#modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  animation: popup 0.3s ease;
+}
+
+#modal-content h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+#modal-content button {
+  margin: 6px;
+  background-color: #7cec8b;
+  border: none;
+  color: #111;
+  font-weight: 600;
+  padding: 8px 15px;
+  border-radius: 10px;
+}
+
+#modal-content button:hover {
+  background-color: #34c759;
+  color: white;
+}
+
+#close {
+  color: red;
+  font-weight: bold;
+  float: right;
+  cursor: pointer;
+}
+
+
+#authorTable{
+  margin-top: 15px;
+  height: 200px;
+  overflow-y: scroll;
+}
+.existingAuthor {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  
+  overflow: hidden;
+  
+}
+
+.existingAuthor th {
+  background-color: #7cec8b;
+  padding: 8px;
+}
+
+.existingAuthor td {
+  background-color: #f5fff7;
+  text-align: center;
+  padding: 8px;
+  border: 1px solid #d1e7d8;
+}
+
+.existingAuthor tr:hover td {
+  background-color: #d8f7de;
+}
+
+
+@keyframes popup {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+     
+      <div class="container1">
+        <div class="submitNewAuthor">
+        <h2 id="formTitle">New Author</h2>
+         
+          <label for="authourFile">Enter Your JSON file:</label>
+          <input type="file" id="authorFile" accept=".json" />
+          <label for="excelFile">Enter Your Excel file:</label>
+          <input type="file" id="excelFile" accept=".xlsx" />
+          <label for="newAuthor">Add New Author:</label>
+        <input type="text" name="newAuthor" id="newAuthor">
+        <button id="submitAuthor" onclick="getAuthor()">Add Author</button>
+        <div id="messageAuthor"></div>
+        <div id="authorTable">
+          <table class="existingAuthor">
+            
+            <tbody id="existAuthor">
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="submitNewBook" id="SNB">
+        <h2 id="formTitle">New Book</h2>
+        <label for="title">Book Title:</label>
+        <input type="text" id="title" name="title" required /><br /><br />
+        <label for="author">Author/Aouthors:</label>
+        <input list="authorlist" id="author" name="author" placeholder="search author..." required />
+        <datalist id="authorlist">
+          <div id="authorlist"></div>
+        </datalist>
+        <br /><br />
+        <label for="pages">Pages:</label>
+        <input type="text" id="pages" name="pages" required /><br /><br />
+        <label for="date">Publication Date:</label>
+        <input type="date" id="date" name="date" required /><br /><br />
+        <label for="price">Price:</label>
+        <input type="text" id="price" name="price" required /><br /><br />
+        <label for="has_translation">Has Translation:</label>
+        <input
+          type="checkbox"
+          id="has_translation"
+          name="has_translation"
+        /><br /><br />
+        <button id="submit" onclick="store()">Add Book</button>
+        <div id="message"></div>
+      </div>
+
+      </div>
+      
+      <div id="bookListSection">
+        <h2>Book List</h2>
+        <h5 id="counter"></h5>
+
+         <div id="exportOptions">
+          <div id="modal-content">
+            <div id="close">X</div>
+            <h3>What type do you want to export this table?</h3>
+            <button id="dowloadPdf">Export PDF</button>
+            <button id="downloadExcel">Export Excel</button>
+          </div>
+      
+      </div>
+
+        <button id="downloadTable" >Download Table</button>
+        <div id="bookList">
+          <table id="booksTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Pages</th>
+                <th>Publication Date</th>
+                <th>Price</th>
+                <th>Has Translation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="booksTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+ 
+  <script>
+    let Authors = JSON.parse(localStorage.getItem("Authors")) || [];
+    let books = JSON.parse(localStorage.getItem("books")) || [];
+    let bookId = null;
+    const downloadPdf = document.getElementById('dowloadPdf');
+    const downloadTable = document.getElementById('downloadTable');
+    const close = document.getElementById('close');
+    const exportOptions = document.getElementById('exportOptions');
+    const excelFile = document.getElementById('excelFile');
+    const counter = document.getElementById('counter');
+    const downloadExcel = document.getElementById('downloadExcel');
+    const authorFile = document.getElementById('authorFile');
+    const authorTable = document.getElementById('authorTable');
+     const existAuthor = document.getElementById('existAuthor');
+    const messageAuthor = document.getElementById('messageAuthor');
+    const newAuthor = document.getElementById('newAuthor');
+    const authorList = document.getElementById('authorlist');
+    const titleInput = document.getElementById("title");
+    const authorSelect = document.getElementById("author");
+    const pagesInput = document.getElementById("pages");
+    const dateInput = document.getElementById("date");
+    const priceInput = document.getElementById("price");
+    const hasTranslationCheckbox = document.getElementById("has_translation");
+    const submitButton = document.getElementById("submit");
+    let booksTableBody = document.getElementById("booksTableBody");
+    const messageDiv = document.getElementById("message");
+    const newDate = new Date();
+      
+    const reset = () => {
+      titleInput.value = "";
+      authorSelect.value = "";
+      pagesInput.value = "";
+      dateInput.value = "";
+      priceInput.value = "";
+      hasTranslationCheckbox.checked = false;
+      newAuthor.value = "";
+      submitButton.textContent = "Add Book";
+    };
+
+    downloadTable.addEventListener('click' , ()=>{
+    exportOptions.style.display = 'flex';
+   })
+
+    close.addEventListener('click' , ()=>{
+      exportOptions.style.display = 'none';
+    })
+
+   downloadPdf.addEventListener('click' , ()=>{
+    exportOptions.style.display = 'none';
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFont("Vazir", "normal");
+    doc.setFontSize(16);
+    doc.text("Today's books", 105, 15, null, null, "center");
+    
+    const tableColumn = ["ID", "Title", "Author", "Pages", "Publication Date", "Price", "Has Translation"];
+    const tableRows = [];
+    books.forEach(book => {
+      const bookData = [
+        book.id,
+        book.title,
+        book.author,
+        book.pages,
+        book.date,
+        book.price,
+        book.has_translation ? "Yes" : "No"
+      ];
+      tableRows.push(bookData);
+    });
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 25,
+      
+      headStyles: { fillColor: [126, 236, 139], textColor: [17, 17, 17], fontStyle: 'bold' },
+      bodyStyles: { fillColor: [184, 237, 175] },
+      alternateRowStyles: { fillColor: [220, 236, 217] },
+    });
+    doc.setFontSize(10)
+    doc.text('total:' + books.length , 25 , 20 , 'right');
+    doc.setFontSize(8);
+    doc.text(newDate.getFullYear() + "/" + (newDate.getMonth()  +1 )+ "/" + newDate.getDate() , 27 , 15 , 'right');
+    
+    doc.save("کتای های امروز.pdf");
+   })
+
+    downloadExcel.addEventListener('click' , async ()=>{
+      exportOptions.style.display = 'none';
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Books');
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+      worksheet.columns = [
+       {},
+       {},
+       {},
+        { header: '', key: 'id', width: 10  },
+        { header: '', key: 'title', width: 20 },
+        { header: '', key: 'author', width: 20 },
+        { header: '', key: 'pages', width: 10 },
+        { header: '', key: 'date', width: 15 },
+        { header: '', key: 'price', width: 10 },
+        { header: '', key: 'has_translation', width: 15 },
+      ];
+      const headerRow = worksheet.getRow(5);
+      
+      headerRow.values = [   "", "", "",'ID', 'Title', 'Author', 'Pages', 'Publication Date', 'Price', 'Has Translation'];
+     
+      const dataStartRow = 5;
+
+      books.forEach((book , index) => {
+       
+        
+       
+        worksheet.addRow({
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          pages: book.pages,
+          date: book.date,
+          price: book.price,
+          has_translation: book.has_translation ? 'Yes' : 'No'
+        });
+      });
+      
+      
+      worksheet.columns.forEach((column , index)   => {
+        if(!column.key && index < 3) 
+        return;
+      else{
+        
+        column.alignment = { vertical: 'middle', horizontal: 'center' };
+        column.eachCell({ includeEmpty: true }, cell => {
+         
+          if(cell.row <= 4){ {
+            cell.fill = {
+              type:'pattern',
+              pattern:'solid',
+              fgColor: { argb: '' }
+            };
+            
+          }
+          }
+          else
+          if (cell.row === 5) {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: '7cec8b' }
+            };
+            cell.font = { color: { argb: '111111' }, bold: true };
+          }
+          else{
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'b8edaf' }
+            };
+          }
+        
+        });
+      }
+
+      });
+      
+      const buffer =  await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "کتای های امروز.xlsx";
+      link.click();
+
+    });
+
+      authorFile.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const reader = new FileReader(); 
+      reader.onload = (e) => {
+        try {
+          const content = e.target.result;
+          const parsedAuthors = JSON.parse(content);
+          if (Array.isArray(parsedAuthors)) {
+            parsedAuthors.forEach((author) => {
+              if (!Authors.some(a => a.name.toLowerCase() === author.name.toLowerCase())) {
+                Authors.push(author);
+              }
+            });
+            localStorage.setItem("Authors", JSON.stringify(Authors));
+            showAuthors();
+            showExistAuthors();
+            authorTable.classList.remove("hidden");
+            messageAuthor.style.color = "green";
+            messageAuthor.textContent = "Authors loaded successfully!";
+          } else {
+            throw new Error("Invalid JSON format");
+          }
+        } catch (error) {
+          messageAuthor.style.color = "red";
+          messageAuthor.textContent = "Error loading authors: " + error.message;
+        }
+      };  
+      reader.readAsText(file);
+    });
+   
+    excelFile.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const arrayBuffer = e.target.result;
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(arrayBuffer);
+          const worksheet = workbook.worksheets[0];
+          worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) {
+              const authorName = row.getCell(1).value;
+              if (authorName && !Authors.some(a => a.name.toLowerCase() === authorName.toLowerCase())) {
+                Authors.push({ name: authorName });
+              }
+            }
+          });
+          localStorage.setItem("Authors", JSON.stringify(Authors));
+          showAuthors();
+          showExistAuthors();
+          authorTable.classList.remove("hidden");
+          messageAuthor.style.color = "green";
+          messageAuthor.textContent = "Authors loaded successfully from Excel!";
+        } catch (error) {
+          messageAuthor.style.color = "red";
+          messageAuthor.textContent = "Error loading authors from Excel: " + error.message;
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+    
+    
+      const getAuthor = ()=>{
+        if(!newAuthor.value){
+          messageAuthor.style.color = "red";
+          messageAuthor.textContent = "Please enter an Author name!";
+          return;
+        }
+        if(Authors.some(author => author.name.toLowerCase() === newAuthor.value.toLowerCase())){
+          messageAuthor.style.color = "red";
+          messageAuthor.textContent = "Author already exists!";
+        }
+        
+        else{
+          const author = {
+            name: newAuthor.value
+          }
+          Authors.push(author);
+          localStorage.setItem("Authors", JSON.stringify(Authors));
+          messageAuthor.style.color = "green";
+          messageAuthor.textContent = "Author added successfully!";
+          showAuthors();
+          showExistAuthors();
+          authorTable.classList.remove("hidden");
+          newAuthor.value = "";
+        }
+
+      
+
+    }
+     function showAuthors() {
+      let html2 = ``;
+      Authors.forEach((author) => {
+        html2 += `<option value="${author.name}">${author.name}</option>`;
+      });
+      authorList.innerHTML = html2;
+    }
+    showAuthors();
+    function showExistAuthors() {
+      let html3 = ``;
+      Authors.forEach((author) => {
+        html3 += `<tr>
+          <td>${author.name}</td>
+          </tr>`;
+      });
+      existAuthor.innerHTML = html3;
+    }
+    showExistAuthors();
+    
+
+
+
+    const index = () => {
+
+      let html = ``;
+      books.forEach((book, index) => {
+        html += `<tr>
+					<td>${++index}</td>
+					<td>${book.title}</td>
+					<td>${book.author}</td>
+					<td>${book.pages}</td>
+					<td>${book.date}</td>
+					<td>${book.price}</td>
+					<td>${book.has_translation ? "Yes" : "No"}</td>
+					<td>
+						<button onclick="edit(${book.id})">Edit</button>
+						<button onclick="destroy(${book.id})">Delete</button>
+					</td>
+				  </tr>`;
+         
+      });
+      counter.textContent = `Total Books: ${books.length}`;
+
+      booksTableBody.innerHTML = html;
+      reset();
+    };
+    index();
+
+    const store = () => {
+      console.log(authorSelect.value);
+
+      const book = {
+        title: titleInput.value,
+        author: authorSelect.value,
+        pages: pagesInput.value,
+        date: dateInput.value,
+        price: priceInput.value,
+        has_translation: hasTranslationCheckbox.checked,
+        id: new Date().getTime(),
+      };
+      if (submitButton.textContent === "Update") {
+        const bookIndex = books.findIndex((b) => b.id === bookId);
+        if (bookIndex !== -1) {
+          books[bookIndex] = { ...book, id: bookId };
+          localStorage.setItem("books", JSON.stringify(books));
+          index();
+          messageDiv.style.color = "green";
+          messageDiv.textContent = "Book updated successfully!";
+          reset();
+          submitButton.textContent = "Add Book";
+          return;
+        }
+      }
+      if (
+        !book.title ||
+        !book.author ||
+        !book.pages ||
+        !book.date ||
+        !book.price
+      ) {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "Please fill in all fields.";
+        return;
+      }else if(submitButton.textContent === "Add Book"){ {
+         books.push(book);
+        localStorage.setItem("books", JSON.stringify(books));
+      index();
+      messageDiv.style.color = "green";
+      messageDiv.textContent = "Book added successfully!";
+      }
+    }
+
+      
+    };
+    const edit = (id) => {
+      const book = books.find((b) => b.id === id);
+
+      if (book) {
+        titleInput.value = book.title;
+        authorSelect.value = book.author;
+        pagesInput.value = book.pages;
+        dateInput.value = book.date;
+        priceInput.value = book.price;
+        hasTranslationCheckbox.checked = book.has_translation;
+        submitButton.textContent = "Update";
+      }
+      bookId = id;
+    };
+     
+   
+    
+    const destroy = (id) => {
+      books = books.filter((b) => b.id !== id);
+      localStorage.setItem("books", JSON.stringify(books));
+      index();
+      messageDiv.textContent = "Book deleted successfully!";
+    };
+  </script>
+</html>
